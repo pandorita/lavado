@@ -8,31 +8,62 @@ class MasterPanel:
     def __init__(self):
 
         def abrir_ventana():
-            ventana = tb.Toplevel("Generar Servicio", resizable=(False, False))
+
+            def limitar_caracteres(*args):
+                if len(limitarcaracteres.get()) > 6:
+                    limitarcaracteres.set(limitarcaracteres.get()[:6])
+
+            limitarcaracteres = tb.StringVar()
+            limitarcaracteres.trace("w", limitar_caracteres)      
+
+            def convertir_mayusculas(*args):
+                todomayuscula.set(todomayuscula.get().upper())
+            
+            todomayuscula = tb.StringVar()
+            todomayuscula.trace("w", convertir_mayusculas)
+
+            
+
+            ventana = tb.Toplevel("Full CarWash - Generar Servicio", resizable=(False, False))
             ventana.iconbitmap('imagenes/logochiquito.ico')
+            # Obtener el ancho y la altura de la pantalla del usuario
+            ancho_pantalla = ventana.winfo_screenwidth()
+            altura_pantalla = ventana.winfo_screenheight()
+
+            # Obtener el ancho y la altura de la ventana
+            ancho_ventana = ventana.winfo_width()
+            altura_ventana = ventana.winfo_height()
+
+            # Calcular la posición x e y para la ventana
+            pos_x = int((ancho_pantalla - ancho_ventana) / 3)
+            pos_y = int((altura_pantalla - altura_ventana) / 5)
+
+            # Establecer la posición de la ventana
+            ventana.geometry(f"+{pos_x}+{pos_y}")
             ventana.grab_set()
             #agregar metodo destroy() despues de insterar los datos, si no,la pantalla quedara bloqueada
+            ##limitar caracteres para patente
 
             framecontenedor = tb.Frame(ventana)
-            framecontenedor.pack()
+            framecontenedor.pack(pady=20,padx=10)
 
             #frametitulo = tb.Frame(framecontenedor)
             #frametitulo.grid(column=0, row=0)
             
             #label1 = tb.Label(frametitulo, text='Generar Servicio', font=(20))
             #label1.pack(padx=50,pady=30)
-
+            ##DATOS CLIENTE
             frameentry1 = tb.Frame(framecontenedor)
-            frameentry1.grid(column=0, row=1)
+            frameentry1.grid(column=0, row=1, columnspan=2, sticky='nsew')
 
             lfcliente = tb.LabelFrame(frameentry1, text='Datos Cliente')
-            lfcliente.pack(padx=10,pady=10, fill='both', expand='yes')
+            lfcliente.pack(padx=10,pady=10, fill='both', expand=True)
 
-            label2 = tb.Label(lfcliente, text='NOMBRE O APODO CLIENTE')
+            label2 = tb.Label(lfcliente, text='NOMBRE (APODO)')
             #label2.pack(padx=10,pady=10, side='left')
             label2.grid(padx=10,pady=10,row=0,column=0)
 
-            entry1 = tb.Entry(lfcliente, width=50)
+            entry1 = tb.Entry(lfcliente, width=50, textvariable=todomayuscula)
             #entry1.pack(padx=10,pady=10, side='right')
             entry1.grid(padx=10,pady=10, row=0,column=1, sticky='w')
             
@@ -47,32 +78,97 @@ class MasterPanel:
             #entry2.pack(padx=10,pady=10, side='right')
             entry2.grid(padx=10,pady=10, row=1,column=1, sticky='w')
 
+            ##INFORMACION DEL VEHICULO
             frameentry3 = tb.Frame(framecontenedor)
-            frameentry3.grid(column=0, row=3)
+            frameentry3.grid(column=0, row=3, columnspan=2, sticky='nsew')
 
-            label4 = tb.Label(frameentry3, text='TIPO DE VEHICULO')
-            label4.pack(padx=10,pady=10, side= 'left')
+            lbvehiculo = tb.LabelFrame(frameentry3, text='Informacion del Vehiculo')
+            lbvehiculo.pack(padx=10,pady=10, fill='both', expand='yes')
 
-            entry3 = tb.Combobox(frameentry3, width=30, justify='center', values=(
+            label4 = tb.Label(lbvehiculo, text='TIPO DE VEHICULO')
+            label4.grid(padx=10,pady=10, row=0,column=0, sticky='w')
+
+            entry3 = tb.Combobox(lbvehiculo, width=20, justify='center', values=(
                 '----autos', 'sedan corto', 'sedan', 'sedan largo', 
                 '----suv', 'suv pequeña', 'suv 2 corridas', 'suv 2 corridas grande', 'suv 3 corridas',
                 '----todoterreno', 'jeep pequeño'
                 'camioneta 4x4'), state='readonly')
-            entry3.pack(padx=10,pady=10, side= 'left')
+            entry3.grid(padx=10,pady=10, row=0,column=1, sticky='w')
 
+            labelpatente = tb.Label(lbvehiculo, text='PATENTE')
+            labelmodelo = tb.Label(lbvehiculo, text='MODELO')
+            labelcolor = tb.Label(lbvehiculo, text='COLOR')
+            entrypatente = tb.Entry(lbvehiculo, textvariable=limitarcaracteres)
+            entrymodelo = tb.Entry(lbvehiculo)
+            entrycolor = tb.Entry(lbvehiculo)
+            labelpatente.grid(padx=10,pady=10, row=1,column=0, sticky='w')
+            labelmodelo.grid(padx=10,pady=10, row=2,column=0, sticky='w')
+            labelcolor.grid(padx=10,pady=10, row=2,column=2, sticky='w')
+            entrypatente.grid(padx=10,pady=10, row=1,column=1, sticky='w')
+            entrymodelo.grid(padx=10,pady=10, row=2,column=1, sticky='w')
+            entrycolor.grid(padx=10,pady=10, row=2,column=3, sticky='w')
+
+            ##INFORMACION DEL SERVICIO
             frameentry4 = tb.Frame(framecontenedor)
-            frameentry4.grid(column=0, row=4)
+            lfinfos = tb.LabelFrame(frameentry4,text='Informacion del Servicio')
+            label5 = tb.Label(lfinfos, text='SERVICIO')
+            rb1 = tb.Radiobutton(lfinfos, text='FULL', variable=False, value=0)
+            rb2 = tb.Radiobutton(lfinfos, text='Sólo por FUERA', variable=False, value=1)
+            rb3 = tb.Radiobutton(lfinfos, text='Sólo por DENTRO', variable=False, value=2)
+            lblnotas = tb.Label(lfinfos, text='NOTAS')
+            entnotas = tb.Entry(lfinfos, width=67)
 
-            label5 = tb.Label(frameentry4, text='SERVICIO')
-            label5.pack(padx=10,pady=10, side= 'left')
+            frameentry4.grid(column=0, row=4, columnspan=2, sticky='nsew')
+            lfinfos.pack(padx=10,pady=10, fill='both', expand='yes')
+            label5.grid(padx=10,pady=10, row=0,column=0, sticky='w')
+            rb1.grid(padx=10,pady=10, row=0,column=1)
+            rb2.grid(padx=10,pady=10, row=0,column=2)
+            rb3.grid(padx=10,pady=10, row=0,column=3)
+            lblnotas.grid(padx=10,pady=10, row=1,column=0, sticky='w')
+            entnotas.grid(padx=10, pady=10, row=1, column=1,columnspan=3)
 
-            rb1 = tb.Radiobutton(frameentry4, text='FULL', variable=False, value=0)
-            rb1.pack(padx=10,pady=10, side= 'left')
-            rb2 = tb.Radiobutton(frameentry4, text='Sólo por FUERA', variable=False, value=1)
-            rb2.pack(padx=10,pady=10, side= 'left')
-            rb3 = tb.Radiobutton(frameentry4, text='Sólo por DENTRO', variable=False, value=2)
-            rb3.pack(padx=10,pady=10, side= 'left')
+            ##VALOR Y DESCUENTO
+            framevalor = tb.Frame(framecontenedor)
+            lfvalor = tb.LabelFrame(framevalor, text='Valor y descuento del servicio')
+            lbldct = tb.Label(lfvalor, text='DESCUENTO')
+            entdct = tb.Entry(lfvalor, state='false')
+            framevalorf = tb.Frame(framecontenedor)
+            lfvalorf = tb.LabelFrame(framevalorf, text='$$')
+            lblvalorf = tb.Label(lfvalorf, text= 'Valor', font=('Comic Sans', 11))
+            lblvalornum = tb.Label(lfvalorf, text='$10.000', font=('Comic Sans', 11))
+            lblvalordcto = tb.Label(lfvalorf, text='Dcto', font=('Comic Sans', 11))
+            lblvalordctonum = tb.Label(lfvalorf, text='$3.000', font=('Comic Sans', 11), style='danger')
+            lblvalorfinal = tb.Label(lfvalorf, text='Total a pagar', font=('Comic Sans', 12, 'bold'))
+            lblvalorfinalnum = tb.Label(lfvalorf, text='$7.000', font=('Comic Sans', 12, 'bold'))
 
+            framevalor.grid(column=0, row=5, sticky='nsew')
+            lfvalor.pack(padx=10,pady=10, side='left', fill='both')
+            lbldct.grid(padx=10, pady=10, row=0, column=0)
+            entdct.grid(padx=10, pady=10, row=0, column=1)
+            framevalorf.grid(padx=10,pady=10, column=0, row=6, sticky='nsew')
+            lfvalorf.pack(padx=10,pady=10, fill='both')
+            lblvalorf.grid(padx=10, pady=1, row=0, column=0, sticky='e')
+            lblvalornum.grid(padx=10, pady=1, row=0, column=1, sticky='w')
+            lblvalordcto.grid(padx=10, pady=1, row=1, column=0, sticky='e')
+            lblvalordctonum.grid(padx=10, pady=1, row=1, column=1, sticky='w')
+            lblvalorfinal.grid(padx=10, pady=1, row=2, column=0, sticky='e')
+            lblvalorfinalnum.grid(padx=10, pady=1, row=2, column=1, sticky='w')
+
+            framevalorf.columnconfigure(0, weight=1)
+            framevalorf.columnconfigure(1, weight=1)
+            framevalorf.rowconfigure(0, weight=1)
+            framevalorf.rowconfigure(1, weight=1)
+            framevalorf.rowconfigure(2, weight=1)
+
+            ##BOTONES ACEPTER Y CANCELAR
+
+            fmbotones = tb.Frame(framecontenedor)
+            btaceptar = tb.Button(fmbotones, style='success', text='Aceptar')
+            btcancelar = tb.Button(fmbotones, style='danger',text='Cancelar')
+
+            fmbotones.grid(row=6,column=1)
+            btcancelar.pack(padx=10, pady=10, anchor='e' , side='right')
+            btaceptar.pack(padx=10, pady=10, anchor='e' ,side='right')
 
 
 
@@ -80,7 +176,7 @@ class MasterPanel:
 
         self.window = tb.Window(themename="darkly")
         self.window.iconbitmap('imagenes/logochiquito.ico')
-        self.window.title("FULL CAR WASH")
+        self.window.title("Full CarWash")
         self.window.minsize('1000','800')
         #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
         #self.window.geometry("%dx%d+0+0" % (w, h))
@@ -113,6 +209,11 @@ class MasterPanel:
         tabla.column('#3', width=100,minwidth=100)
         tabla.column('#4', width=100,minwidth=100)
         tabla.column('#5', width=100,minwidth=100)
+
+        tabla.tag_configure('01', foreground='red')
+
+
+        
 
 
         madeby = tb.Label(text='Version Alpha 1.0.0     -     Made by Pandorita ❤️', font=('Open Sans', 10,'italic' ))
